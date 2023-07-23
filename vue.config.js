@@ -1,4 +1,13 @@
-const { defineConfig } = require('@vue/cli-service')
+const { defineConfig } = require("@vue/cli-service");
 module.exports = defineConfig({
-  transpileDependencies: true
-})
+  transpileDependencies: true,
+  devServer: {
+    proxy: {
+      "/lbdemo": {
+        target: "https://content.launchbrightly.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/lbdemo/, ""),
+      },
+    },
+  },
+});
