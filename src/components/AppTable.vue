@@ -14,10 +14,10 @@
           <td>{{ item.name }}</td>
           <td>{{ item.description }}</td>
           <td>
-            {{ item.FeatureEditions.items.length }}
+            {{ item.FeatureEditions?.items[0]?.edition?.name }}
           </td>
           <td>
-            {{ formatTime(item.screenshots.items[0].timeOfCapture) }}
+            {{ formatTime(item.screenshots?.items[0]?.timeOfCapture) }}
           </td>
         </tr>
       </tbody>
