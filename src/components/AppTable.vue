@@ -1,20 +1,24 @@
 <template>
   <div>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Edition(s)</th>
-          <th>Time of Screenshot</th>
+    <table class="table w-full table-fixed">
+      <thead class="table-header-group">
+        <tr class="table-row">
+          <th class="table-cell text-left" @click="sortTable('name')">Name</th>
+          <th class="table-cell text-left" @click="sortTable('description')">
+            Description
+          </th>
+          <th class="table-cell text-left" @click="sortTable('edition')">
+            Edition(s)
+          </th>
+          <th class="table-cell text-left">Time of Screenshot</th>
         </tr>
       </thead>
-      <tbody>
-        <tr v-for="item in data" :key="item.id">
-          <td>{{ item.name }}</td>
-          <td>{{ item.description }}</td>
-          <td>{{ item.edition }}</td>
-          <td>
+      <tbody class="table-row-group">
+        <tr v-for="item in sortedData" :key="item.id" class="table-row">
+          <td class="table-cell">{{ item.name }}</td>
+          <td class="table-cell">{{ item.description }}</td>
+          <td class="table-cell">{{ item.edition }}</td>
+          <td class="table-cell">
             {{ formatTime(item.timeOfCapture) }}
           </td>
         </tr>
@@ -24,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import axios from "axios";
 
 const data = ref([]);
@@ -41,5 +45,29 @@ axios.get("/lbdemo/baremetrics.json").then((response) => {
 const formatTime = (timestamp) => {
   const date = new Date(timestamp);
   return date.toLocaleString();
+};
+
+const sortedData = computed(() => {
+  return data.value.slice().sort((a, b) => {
+    const nameA = a[sortKey.value]?.toUpperCase();
+    const nameB = b[sortKey.value]?.toUpperCase();
+    if (sortDirection.value === "asc") {
+      return nameA.localeCompare(nameB);
+    } else {
+      return nameB.localeCompare(nameA);
+    }
+  });
+});
+
+const sortKey = ref("name");
+const sortDirection = ref("asc");
+
+const sortTable = (key) => {
+  if (sortKey.value === key) {
+    sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
+  } else {
+    sortKey.value = key;
+    sortDirection.value = "asc";
+  }
 };
 </script>
