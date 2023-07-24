@@ -86,3 +86,25 @@ const sortTable = (key) => {
   }
 };
 </script>
+
+<style scoped>
+.table-body {
+  background-color: #fff;
+}
+
+.table-cell {
+  padding: 12px 16px;
+}
+
+.table-row:nth-child(odd) {
+  background-color: #fafafa;
+}
+
+.table-row-group .table-row:hover {
+  background-color: #f3f3f3;
+}
+
+.table-header-group .table-row {
+  background-color: #f0f0f0;
+}
+</style>
