@@ -3,34 +3,22 @@
     <table class="table w-full table-fixed border">
       <thead class="table-header-group">
         <tr class="table-row">
-          <th class="table-cell border text-left" @click="sortTable('name')">
-            Name
-          </th>
-          <th
-            class="table-cell border text-left"
-            @click="sortTable('description')"
-          >
-            Description
-          </th>
-          <th class="table-cell border text-left" @click="sortTable('edition')">
-            Edition(s)
-          </th>
-          <th
-            class="table-cell border text-left"
-            @click="sortTable('timeOfCapture')"
-          >
-            Time of Screenshot
-          </th>
+          <TableHeaderCell
+            v-for="header in headers"
+            :key="header.key"
+            :headerKey="header.key"
+            :label="header.label"
+            @sort="sortTable"
+          />
         </tr>
       </thead>
       <tbody class="table-row-group">
         <tr v-for="item in sortedData" :key="item.id" class="table-row">
-          <td class="table-cell border">{{ item.name }}</td>
-          <td class="table-cell border">{{ item.description }}</td>
-          <td class="table-cell border">{{ item.edition }}</td>
-          <td class="table-cell border">
-            {{ formatTime(item.timeOfCapture) }}
-          </td>
+          <TableDataCell
+            v-for="header in headers"
+            :key="header.key"
+            :content="item[header.key]"
+          />
         </tr>
       </tbody>
     </table>
@@ -40,6 +28,8 @@
 <script setup>
 import { ref, computed } from "vue";
 import axios from "axios";
+import TableHeaderCell from "./TableHeaderCell.vue";
+import TableDataCell from "./TableDataCell.vue";
 
 const data = ref([]);
 
@@ -47,15 +37,24 @@ axios.get("/lbdemo/baremetrics.json").then((response) => {
   data.value = response.data.features.items.map((item) => {
     let newItem = { name: item.name, description: item.description };
     newItem.edition = item.FeatureEditions?.items[0]?.edition?.name;
-    newItem.timeOfCapture = item.screenshots?.items[0]?.timeOfCapture;
+    newItem.timeOfCapture = item.screenshots?.items?.filter(
+      (screenshot) =>
+        screenshot.status === "completed" || screenshot.status === "timedOut"
+    );
+    newItem.timeOfCapture =
+      newItem.timeOfCapture?.length > 0
+        ? newItem.timeOfCapture[0].timeOfCapture
+        : "";
     return newItem;
   });
 });
 
-const formatTime = (timestamp) => {
-  const date = new Date(timestamp);
-  return date.toLocaleString();
-};
+const headers = ref([
+  { key: "name", label: "Name" },
+  { key: "description", label: "Description" },
+  { key: "edition", label: "Edition(s)" },
+  { key: "timeOfCapture", label: "Time of Screenshot" },
+]);
 
 const sortedData = computed(() => {
   return data.value.slice().sort((a, b) => {
