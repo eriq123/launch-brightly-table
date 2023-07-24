@@ -15,7 +15,12 @@
           <th class="table-cell border text-left" @click="sortTable('edition')">
             Edition(s)
           </th>
-          <th class="table-cell border text-left">Time of Screenshot</th>
+          <th
+            class="table-cell border text-left"
+            @click="sortTable('timeOfCapture')"
+          >
+            Time of Screenshot
+          </th>
         </tr>
       </thead>
       <tbody class="table-row-group">
@@ -54,12 +59,17 @@ const formatTime = (timestamp) => {
 
 const sortedData = computed(() => {
   return data.value.slice().sort((a, b) => {
-    const nameA = a[sortKey.value]?.toUpperCase();
-    const nameB = b[sortKey.value]?.toUpperCase();
-    if (sortDirection.value === "asc") {
-      return nameA.localeCompare(nameB);
+    if (sortKey.value === "timeOfCapture") {
+      const timeA = new Date(a[sortKey.value]);
+      const timeB = new Date(b[sortKey.value]);
+
+      return sortDirection.value === "asc" ? timeA - timeB : timeB - timeA;
     } else {
-      return nameB.localeCompare(nameA);
+      const nameA = a[sortKey.value]?.toUpperCase();
+      const nameB = b[sortKey.value]?.toUpperCase();
+      return sortDirection.value === "asc"
+        ? nameA.localeCompare(nameB)
+        : nameB.localeCompare(nameA);
     }
   });
 });
