@@ -13,11 +13,9 @@
         <tr v-for="item in data" :key="item.id">
           <td>{{ item.name }}</td>
           <td>{{ item.description }}</td>
+          <td>{{ item.edition }}</td>
           <td>
-            {{ item.FeatureEditions?.items[0]?.edition?.name }}
-          </td>
-          <td>
-            {{ formatTime(item.screenshots?.items[0]?.timeOfCapture) }}
+            {{ formatTime(item.timeOfCapture) }}
           </td>
         </tr>
       </tbody>
@@ -32,7 +30,12 @@ import axios from "axios";
 const data = ref([]);
 
 axios.get("/lbdemo/baremetrics.json").then((response) => {
-  data.value = response.data.features.items;
+  data.value = response.data.features.items.map((item) => {
+    let newItem = { name: item.name, description: item.description };
+    newItem.edition = item.FeatureEditions?.items[0]?.edition?.name;
+    newItem.timeOfCapture = item.screenshots?.items[0]?.timeOfCapture;
+    return newItem;
+  });
 });
 
 const formatTime = (timestamp) => {
