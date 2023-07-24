@@ -8,6 +8,8 @@
             :key="header.key"
             :headerKey="header.key"
             :label="header.label"
+            :isSorted="sortKey === header.key"
+            :isAscending="sortDirection === 'asc'"
             @sort="sortTable"
           />
         </tr>
