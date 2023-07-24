@@ -1,24 +1,29 @@
 <template>
   <div>
-    <table class="table w-full table-fixed">
+    <table class="table w-full table-fixed border">
       <thead class="table-header-group">
         <tr class="table-row">
-          <th class="table-cell text-left" @click="sortTable('name')">Name</th>
-          <th class="table-cell text-left" @click="sortTable('description')">
+          <th class="table-cell border text-left" @click="sortTable('name')">
+            Name
+          </th>
+          <th
+            class="table-cell border text-left"
+            @click="sortTable('description')"
+          >
             Description
           </th>
-          <th class="table-cell text-left" @click="sortTable('edition')">
+          <th class="table-cell border text-left" @click="sortTable('edition')">
             Edition(s)
           </th>
-          <th class="table-cell text-left">Time of Screenshot</th>
+          <th class="table-cell border text-left">Time of Screenshot</th>
         </tr>
       </thead>
       <tbody class="table-row-group">
         <tr v-for="item in sortedData" :key="item.id" class="table-row">
-          <td class="table-cell">{{ item.name }}</td>
-          <td class="table-cell">{{ item.description }}</td>
-          <td class="table-cell">{{ item.edition }}</td>
-          <td class="table-cell">
+          <td class="table-cell border">{{ item.name }}</td>
+          <td class="table-cell border">{{ item.description }}</td>
+          <td class="table-cell border">{{ item.edition }}</td>
+          <td class="table-cell border">
             {{ formatTime(item.timeOfCapture) }}
           </td>
         </tr>
