@@ -5,12 +5,15 @@
         <tr class="table-row">
           <TableHeaderCell
             v-for="header in headers"
+            :metrics="metrics"
             :key="header.key"
             :headerKey="header.key"
             :label="header.label"
             :isSorted="sortKey === header.key"
             :isAscending="sortDirection === 'asc'"
+            :filteredEditions="filteredEditions"
             @sort="sortTable"
+            @updateEditions="updateEditions"
           />
         </tr>
       </thead>
@@ -33,10 +36,19 @@ import axios from "axios";
 import TableHeaderCell from "./TableHeaderCell.vue";
 import TableDataCell from "./TableDataCell.vue";
 
-const data = ref([]);
+const metrics = ref([]);
+const filteredEditions = ref([]);
+const sortKey = ref("name");
+const sortDirection = ref("asc");
+const headers = ref([
+  { key: "name", label: "Name" },
+  { key: "description", label: "Description" },
+  { key: "edition", label: "Edition(s)" },
+  { key: "timeOfCapture", label: "Time of Screenshot" },
+]);
 
 axios.get("/lbdemo/baremetrics.json").then((response) => {
-  data.value = response.data.features.items.map((item) => {
+  metrics.value = response.data.features.items.map((item) => {
     let newItem = { name: item.name, description: item.description };
     newItem.edition = item.FeatureEditions?.items[0]?.edition?.name;
     newItem.timeOfCapture = item.screenshots?.items?.filter(
@@ -51,32 +63,34 @@ axios.get("/lbdemo/baremetrics.json").then((response) => {
   });
 });
 
-const headers = ref([
-  { key: "name", label: "Name" },
-  { key: "description", label: "Description" },
-  { key: "edition", label: "Edition(s)" },
-  { key: "timeOfCapture", label: "Time of Screenshot" },
-]);
+const updateEditions = (selectedEditions) => {
+  filteredEditions.value = selectedEditions;
+};
 
 const sortedData = computed(() => {
-  return data.value.slice().sort((a, b) => {
-    if (sortKey.value === "timeOfCapture") {
-      const timeA = new Date(a[sortKey.value]);
-      const timeB = new Date(b[sortKey.value]);
+  return metrics.value
+    .slice()
+    .filter((item) => {
+      if (filteredEditions.value.length === 0) {
+        return true;
+      }
+      return filteredEditions.value.includes(item.edition);
+    })
+    .sort((a, b) => {
+      if (sortKey.value === "timeOfCapture") {
+        const timeA = new Date(a[sortKey.value]);
+        const timeB = new Date(b[sortKey.value]);
 
-      return sortDirection.value === "asc" ? timeA - timeB : timeB - timeA;
-    } else {
-      const nameA = a[sortKey.value]?.toUpperCase();
-      const nameB = b[sortKey.value]?.toUpperCase();
-      return sortDirection.value === "asc"
-        ? nameA.localeCompare(nameB)
-        : nameB.localeCompare(nameA);
-    }
-  });
+        return sortDirection.value === "asc" ? timeA - timeB : timeB - timeA;
+      } else {
+        const nameA = a[sortKey.value]?.toUpperCase();
+        const nameB = b[sortKey.value]?.toUpperCase();
+        return sortDirection.value === "asc"
+          ? nameA.localeCompare(nameB)
+          : nameB.localeCompare(nameA);
+      }
+    });
 });
-
-const sortKey = ref("name");
-const sortDirection = ref("asc");
 
 const sortTable = (key) => {
   if (sortKey.value === key) {
