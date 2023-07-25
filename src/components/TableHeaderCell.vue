@@ -15,12 +15,13 @@
       :editions="editions"
       :filteredEditions="filteredEditions"
       @updateEditions="updateEditions"
+      @closeDropdown="closeDropdown"
     />
   </th>
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, computed } from "vue";
+import { ref, defineProps, defineEmits, computed, onBeforeUnmount } from "vue";
 import ArrowUp from "./icons/ArrowUp.vue";
 import ArrowDown from "./icons/ArrowDown.vue";
 import Ellipsis from "./icons/IconEllipsis.vue";
@@ -45,6 +46,9 @@ const sortTable = () => {
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value;
 };
+const closeDropdown = () => {
+  showDropdown.value = false;
+};
 
 const editions = computed(() => {
   const distinctEditions = new Set(props.metrics?.map((item) => item.edition));
@@ -58,6 +62,10 @@ const editions = computed(() => {
 const updateEditions = (value) => {
   emit("updateEditions", value);
 };
+
+onBeforeUnmount(() => {
+  closeDropdown();
+});
 </script>
 <style scoped>
 .trigger-button:hover {

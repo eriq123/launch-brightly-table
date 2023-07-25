@@ -1,5 +1,5 @@
 <template>
-  <div class="relative">
+  <div class="relative" ref="dropdown">
     <div class="dropdown">
       <label v-for="edition in distinctEditions" :key="edition.key">
         <input
@@ -16,10 +16,17 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps, defineEmits } from "vue";
+import {
+  ref,
+  computed,
+  defineProps,
+  defineEmits,
+  onMounted,
+  onBeforeUnmount,
+} from "vue";
 
 const props = defineProps(["editions", "filteredEditions"]);
-const emit = defineEmits(["updateEditions"]);
+const emit = defineEmits(["updateEditions", "closeDropdown"]);
 const selectedEditions = ref(props.filteredEditions);
 
 const distinctEditions = computed(() => {
@@ -30,6 +37,23 @@ const distinctEditions = computed(() => {
 const updateEditions = () => {
   emit("updateEditions", selectedEditions.value);
 };
+
+const dropdown = ref(null);
+
+const handleOutsideClick = (event) => {
+  if (dropdown.value && !dropdown.value.contains(event.target)) {
+    emit("updateEditions", selectedEditions.value);
+    emit("closeDropdown");
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("click", handleOutsideClick);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", handleOutsideClick);
+});
 </script>
 
 <style>
